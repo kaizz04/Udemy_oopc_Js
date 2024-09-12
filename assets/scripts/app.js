@@ -22,10 +22,18 @@ class ElementAttribute{
 
 class Component{
 
-    constructor(renderHookId){
+    constructor(renderHookId,shouldRender = true){
         this.hookId = renderHookId;
+        if(shouldRender){
+            this.render();
+
+        }
+      
 
     }
+
+    render(){}
+
     createRootElement(tag, cssClasses,attributes){
         const rootElement = document.createElement(tag);
         if(cssClasses){
@@ -88,8 +96,9 @@ class ShoppingCart extends Component{
 class ProductItem extends Component{
 
     constructor(product, renderHookId){
-        super(renderHookId);
+        super(renderHookId,false);
         this.product = product;
+        this.render();
 
     }
     addToCart(){
@@ -123,33 +132,48 @@ class ProductItem extends Component{
 
 class ProductList extends Component{
     
-        products = [
-            new Product('BMW m3', 'https://images.unsplash.com/photo-1516610540415-d1b25463c7f3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Ym13fGVufDB8fDB8fHww','desc',20000.00),
-            new Product('BMW x3', 'https://images.unsplash.com/photo-1510903117032-f1596c327647?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGJtd3xlbnwwfHwwfHx8MA%3D%3D','desc',40000.00),
-            new Product('BMW m4', 'https://images.unsplash.com/photo-1600268330186-76564be81357?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGJtd3xlbnwwfHwwfHx8MA%3D%3D','desc',50000.00)
-        ]
- 
+        products = [];
+
 
     constructor(renderHookId){
         super(renderHookId);
+        this.fetchProducts(); 
     }
+
+    fetchProducts(){
+        this.products = [
+            new Product('BMW m3', 'https://images.unsplash.com/photo-1516610540415-d1b25463c7f3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Ym13fGVufDB8fDB8fHww','desc',20000.00),
+            new Product('BMW x3', 'https://images.unsplash.com/photo-1510903117032-f1596c327647?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGJtd3xlbnwwfHwwfHx8MA%3D%3D','desc',40000.00),
+            new Product('BMW m4', 'https://images.unsplash.com/photo-1600268330186-76564be81357?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGJtd3xlbnwwfHwwfHx8MA%3D%3D','desc',50000.00)
+        ];
+        this.renderProducts();
+    }
+
+    renderProducts(){
+        for(const prod of this.products){
+            new ProductItem(prod,'prod-list');
+            }
+
+    }
+
     render(){
         this.createRootElement('ul','product-list',[new ElementAttribute('id','prod-list')]);
-        for(const prod of this.products){
-        const productItem = new ProductItem(prod,'prod-list');
-        productItem.render();
-         
+        if(this.products && this.products.length > 0){
+            this.renderProducts();
         }
     }
     
 }
 
-class Shop{
+class Shop {
+    constructor(){
+        this.render();
+    }
+
+
     render(){
         this.cart = new ShoppingCart('app');
-        this.cart.render();
         const productList = new ProductList('app');
-        productList.render();
 
     }
 
@@ -161,7 +185,6 @@ class App{
 
     static init(){
         const shop = new Shop();
-        shop.render();
         this.cart=shop.cart;
     }
 
